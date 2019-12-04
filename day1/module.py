@@ -12,13 +12,16 @@ class Module:
     2
     >>> c = Module(mass=1969)
     >>> c.fuel_requirement()
-    654
+    966
     >>> d = Module(mass=100756)
     >>> d.fuel_requirement()
-    33583
+    50346
     """
     def __init__(self, mass):
         self.mass = mass
 
     def fuel_requirement(self):
-        return math.floor(self.mass / 3) - 2
+        calculated_fuel = math.floor(self.mass / 3) - 2
+        if calculated_fuel <= 0:
+            return 0
+        return calculated_fuel + Module(calculated_fuel).fuel_requirement()
