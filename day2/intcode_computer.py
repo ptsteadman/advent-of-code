@@ -10,17 +10,13 @@ class Opcode(Enum):
 class IntcodeComputer:
     """ Parses and evaluates intcode, returning the value at position 0 once
     the HALT command is reached.
-    >>> c = IntcodeComputer("1,0,0,0,99").eval()
-    >>> c.at(0)
+    >>> IntcodeComputer("1,0,0,0,99").eval().at(0)
     2
-    >>> c = IntcodeComputer("2,3,0,3,99").eval()
-    >>> c.at(3)
+    >>> IntcodeComputer("2,3,0,3,99").eval().at(3)
     6
-    >>> c = IntcodeComputer("2,4,4,5,99,0").eval()
-    >>> c.at(5)
+    >>> IntcodeComputer("2,4,4,5,99,0").eval().at(5)
     9801
-    >>> c = IntcodeComputer("1,1,1,4,99,5,6,0,99").eval()
-    >>> c.at(0)
+    >>> IntcodeComputer("1,1,1,4,99,5,6,0,99").eval().at(0)
     30
     """
 
@@ -32,18 +28,21 @@ class IntcodeComputer:
     def eval(self, ptr=0):
         op = Opcode(self.ints[ptr])
         if op == Opcode.HALT:
-            return
+            return self
         elif op == Opcode.ADD:
-            val_1 = self.ints[ptr + 1]
-            val_2 = self.ints[ptr + 2]
-            ret = self.ints[ptr + 3]
+            val_1 = self.deref(ptr + 1)
+            val_2 = self.deref(ptr + 2)
+            ret = self.at(ptr + 3)
             self.ints[ret] = val_1 + val_2
         elif op == Opcode.MULTIPLY:
-            val_1 = self.ints[ptr + 1]
-            val_2 = self.ints[ptr + 2]
-            ret = self.ints[ptr + 3]
+            val_1 = self.deref(ptr + 1)
+            val_2 = self.deref(ptr + 2)
+            ret = self.at(ptr + 3)
             self.ints[ret] = val_1 * val_2
-        self.eval(ptr+4)
+        return self.eval(ptr+4)
 
     def at(self, idx=0):
         return self.ints[idx]
+
+    def deref(self, idx=0):
+        return self.at(self.at(idx))
